@@ -6,9 +6,13 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,24 +39,21 @@ class IndexedListTest {
 	IndexedList<String> antiPatternListStr;
 
 	static String nameOfClass;
-
 	@BeforeAll
 	static void readConfigFromFile() {
-
-		try (BufferedReader stream = new BufferedReader(new InputStreamReader(new FileInputStream(TEST_CONFIG_DATA)))) {
-			nameOfClass = stream.readLine();
+		try  {
+			nameOfClass = Files.readString(Paths.get(TEST_CONFIG_DATA), StandardCharsets.US_ASCII);
 			System.out.println("Config file found, testing class: " + nameOfClass);
 		} catch (Exception e) {
-			try (PrintStream stream = new PrintStream(new FileOutputStream(TEST_CONFIG_DATA))) {
-				stream.println("telran.util.Array");
+			try {
+				 Files.writeString(Paths.get(TEST_CONFIG_DATA), "telran.util.Array", StandardCharsets.US_ASCII);
 				nameOfClass = "telran.util.Array";
 				System.out.println("Config file not found, testing default class: " + nameOfClass);
-			} catch (FileNotFoundException e1) {
+			} catch (IOException e1) {
 				System.out.println("FileNotFoundException: " + e1.getMessage());
 				fail();
 			}
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,28 +68,10 @@ class IndexedListTest {
 			patternListStr = (IndexedList<String>) Class.forName(nameOfClass).getConstructor().newInstance();
 			antiPatternListInt = (IndexedList<Integer>) Class.forName(nameOfClass).getConstructor().newInstance();
 			antiPatternListStr = (IndexedList<String>) Class.forName(nameOfClass).getConstructor().newInstance();
-		} catch (InstantiationException e) {
-			System.out.println("Fail (InstantiationException): "+e.getMessage());
+		} catch (Exception e) {
+			e.getStackTrace();
 			fail();
-		} catch (IllegalAccessException e) {
-			System.out.println("Fail (IllegalAccessException): "+e.getMessage());
-			fail();
-		} catch (IllegalArgumentException e) {
-			System.out.println("Fail (IllegalArgumentException): "+e.getMessage());
-			fail();
-		} catch (InvocationTargetException e) {
-			System.out.println("Fail (InvocationTargetException): "+e.getMessage());
-			fail();
-		} catch (NoSuchMethodException e) {
-			System.out.println("Fail (NoSuchMethodException): "+e.getMessage());
-			fail();
-		} catch (SecurityException e) {
-			System.out.println("Fail (SecurityException): "+e.getMessage());
-			fail();
-		} catch (ClassNotFoundException e) {
-			System.out.println("Fail (ClassNotFoundException): "+e.getMessage());
-			fail();
-		}
+		} 
 
 		for (int i = 0; i < arrayInt.length; i++) {
 			listInt.add(arrayInt[i]);
