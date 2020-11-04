@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import telran.util.*;
 
 class IndexedListTest {
+	private static final String DEFAULT_CLASS_NAME = "telran.util.Array";
 	private static final String TEST_CONFIG_DATA = "testConfig.txt";
 	int[] arrayInt = { 1, 2, 3, 4, 5, 6, 7, 8 };
 	String[] arrayString = { "i", "like", "java", "more", "then", "i", "like", "to", "sleep" };
@@ -37,19 +38,22 @@ class IndexedListTest {
 	String[] antiPatternString = { "dance", "all", "night" };
 	IndexedList<Integer> antiPatternListInt;
 	IndexedList<String> antiPatternListStr;
-
+	
 	static String nameOfClass;
+	static Class <?> clazz;
 	@BeforeAll
 	static void readConfigFromFile() {
 		try  {
 			nameOfClass = Files.readString(Paths.get(TEST_CONFIG_DATA), StandardCharsets.US_ASCII);
 			System.out.println("Config file found, testing class: " + nameOfClass);
+			clazz = Class.forName(nameOfClass);
 		} catch (Exception e) {
 			try {
-				 Files.writeString(Paths.get(TEST_CONFIG_DATA), "telran.util.Array", StandardCharsets.US_ASCII);
-				nameOfClass = "telran.util.Array";
+				 Files.writeString(Paths.get(TEST_CONFIG_DATA), DEFAULT_CLASS_NAME, StandardCharsets.US_ASCII);
+				nameOfClass = DEFAULT_CLASS_NAME;
+				clazz = Class.forName(nameOfClass);
 				System.out.println("Config file not found, testing default class: " + nameOfClass);
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				System.out.println("FileNotFoundException: " + e1.getMessage());
 				fail();
 			}
@@ -61,13 +65,13 @@ class IndexedListTest {
 	void setup() {
 
 		try {
-			listInt = (IndexedList<Integer>) Class.forName(nameOfClass).getConstructor().newInstance();
-			listStr = (IndexedList<String>) Class.forName(nameOfClass).getConstructor().newInstance();
+			listInt = (IndexedList<Integer>) clazz.getConstructor().newInstance();
+			listStr = (IndexedList<String>) clazz.getConstructor().newInstance();
 
-			patternListInt = (IndexedList<Integer>) Class.forName(nameOfClass).getConstructor().newInstance();
-			patternListStr = (IndexedList<String>) Class.forName(nameOfClass).getConstructor().newInstance();
-			antiPatternListInt = (IndexedList<Integer>) Class.forName(nameOfClass).getConstructor().newInstance();
-			antiPatternListStr = (IndexedList<String>) Class.forName(nameOfClass).getConstructor().newInstance();
+			patternListInt = (IndexedList<Integer>) clazz.getConstructor().newInstance();
+			patternListStr = (IndexedList<String>) clazz.getConstructor().newInstance();
+			antiPatternListInt = (IndexedList<Integer>) clazz.getConstructor().newInstance();
+			antiPatternListStr = (IndexedList<String>) clazz.getConstructor().newInstance();
 		} catch (Exception e) {
 			e.getStackTrace();
 			fail();
